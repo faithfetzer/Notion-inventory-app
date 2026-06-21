@@ -299,15 +299,50 @@ async function notionFetch(path, method, body) {
 }
 
 async function initDropdowns() {
+  const cacheKey = 'inv_dropdowns';
+  const cached = localStorage.getItem(cacheKey);
+  if (cached) {
+    try {
+      const { locOpts, unitOpts, workspaces } = JSON.parse(cached);
+      applyDropdowns(locOpts, unitOpts, workspaces);
+      checkUrlParams();
+      refreshDropdownsInBackground(cacheKey);
+      return;
+    } catch(e) {}
+  }
+  const fresh = await fetchDropdownData();
+  applyDropdowns(fresh.locOpts, fresh.unitOpts, fresh.workspaces);
+  localStorage.setItem(cacheKey, JSON.stringify(fresh));
+  checkUrlParams();
+}
+
+async function refreshDropdownsInBackground(cacheKey) {
+  try {
+    const fresh = await fetchDropdownData();
+    applyDropdowns(fresh.locOpts, fresh.unitOpts, fresh.workspaces);
+    localStorage.setItem(cacheKey, JSON.stringify(fresh));
+  } catch(e) {}
+}
+
+async function fetchDropdownData() {
   const [db, wsData] = await Promise.all([
     notionFetch('/databases/' + cfg.mainDbId),
     notionFetch('/databases/' + cfg.wsDbId + '/query', 'POST', { page_size: 100 })
   ]);
-
   const props = db.properties;
-  locationOptions = props['Location']?.multi_select?.options || [];
+  const locOpts = props['Location']?.multi_select?.options || [];
   const unitOpts = props['Quantity Unit']?.select?.options || [];
+  const workspaces = [];
+  wsData.results.forEach(page => {
+    const name = page.properties['Name']?.title?.[0]?.plain_text || '';
+    const cat = page.properties['Category']?.select?.name || page.properties['Category']?.multi_select?.[0]?.name || '';
+    if (name) workspaces.push({ id: page.id, name, cat });
+  });
+  return { locOpts, unitOpts, workspaces };
+}
 
+function applyDropdowns(locOpts, unitOpts, workspaces) {
+  locationOptions = locOpts;
   renderChips('locationChips', locationOptions, []);
   renderChips('editLocationChips', locationOptions, []);
 
@@ -326,15 +361,12 @@ async function initDropdowns() {
     const s = document.getElementById(id);
     while (s.options.length > 1) s.remove(1);
   });
-  wsData.results.forEach(page => {
-    const name = page.properties['Name']?.title?.[0]?.plain_text || '';
-    const cat = page.properties['Category']?.select?.name || page.properties['Category']?.multi_select?.[0]?.name || '';
-    if (!name) return;
-    workspaceMap[page.id] = { name, cat };
-    ['workspaceSelect','filterWorkspace','editWs'].forEach(id => document.getElementById(id).add(new Option(name, page.id)));
+  workspaces.forEach(ws => {
+    workspaceMap[ws.id] = { name: ws.name, cat: ws.cat };
+    ['workspaceSelect','filterWorkspace','editWs'].forEach(id => {
+      document.getElementById(id).add(new Option(ws.name, ws.id));
+    });
   });
-
-  checkUrlParams();
 }
 
 function renderChips(containerId, options, selected) {
