@@ -408,7 +408,7 @@ function buildProps({ name, wsId, loc, qty, unit, due, acq, cat }) {
   if (loc && loc.length) p['Location'] = { multi_select: loc.map(n => ({ name: n })) };
   if (qty !== '' && qty != null) p['Quantity'] = { number: parseFloat(qty) };
   if (unit) p['Quantity Unit'] = { select: { name: unit } };
-  if (due) p['Due date'] = { date: { start: due } };
+  if (due) p['Due Date'] = { date: { start: due } };
   if (acq) p['Date acquired'] = { date: { start: acq } };
   if (cat) p['Category'] = { select: { name: cat } };
   return p;
@@ -465,7 +465,7 @@ function openEdit(page) {
   renderChips('editLocationChips', locationOptions, selectedLocs);
   document.getElementById('editQty').value = p['Quantity']?.number ?? '';
   document.getElementById('editUnit').value = p['Quantity Unit']?.select?.name || '';
-  document.getElementById('editDue').value = p['Due date']?.date?.start || '';
+  document.getElementById('editDue').value = p['Due Date']?.date?.start || '';
   document.getElementById('editAcq').value = p['Date acquired']?.date?.start || '';
   const wsId = p['Workspaces Database']?.relation?.[0]?.id || '';
   document.getElementById('editWs').value = wsId;
@@ -490,7 +490,7 @@ async function saveEdit() {
   const props = buildProps({ name, wsId, loc, qty, unit, due, acq, cat });
   if (qty === '') props['Quantity'] = { number: null };
   if (!unit) props['Quantity Unit'] = { select: null };
-  if (!due) props['Due date'] = { date: null };
+  if (!due) props['Due Date'] = { date: null };
   if (!acq) props['Date acquired'] = { date: null };
   if (!loc.length) props['Location'] = { multi_select: [] };
 
