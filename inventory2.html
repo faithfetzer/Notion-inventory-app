@@ -334,7 +334,7 @@ async function initDropdowns() {
     ['workspaceSelect','filterWorkspace','editWs'].forEach(id => document.getElementById(id).add(new Option(name, page.id)));
   });
 
-  setTimeout(checkUrlParams, 500);
+  setTimeout(checkUrlParams, 800);
 }
 
 function renderChips(containerId, options, selected) {
@@ -358,14 +358,14 @@ function checkUrlParams() {
   const params = new URLSearchParams(window.location.search);
   const loc1 = params.get('loc1');
   const loc2 = params.get('loc2');
-  if (loc1 || loc2) {
-    const filterLoc = document.getElementById('filterLocation');
+  if (!loc1 && !loc2) return;
     const val = loc1 || loc2;
+    const filterLoc = document.getElementById('filterLocation');
     for (let o of filterLoc.options) {
-      if (o.value.toLowerCase() === loc.toLowerCase()) { filterLoc.value = o.value; break; }
+      if (o.value.toLowerCase() === val.toLowerCase()) { filterLoc.value = o.value; break; }
     }
     switchTab('browse');
-    setTimeout(loadItems, 100);
+    loadItems();
   }
 }
 
