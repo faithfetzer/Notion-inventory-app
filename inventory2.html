@@ -365,7 +365,7 @@ function checkUrlParams() {
       if (o.value.toLowerCase() === loc.toLowerCase()) { filterLoc.value = o.value; break; }
     }
     switchTab('browse');
-    loadItems();
+    setTimeout(loadItems, 100);
   }
 }
 
