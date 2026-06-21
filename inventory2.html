@@ -334,7 +334,7 @@ async function initDropdowns() {
     ['workspaceSelect','filterWorkspace','editWs'].forEach(id => document.getElementById(id).add(new Option(name, page.id)));
   });
 
-  setTimeout(checkUrlParams, 100);
+  checkUrlParams();
 }
 
 function renderChips(containerId, options, selected) {
