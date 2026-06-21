@@ -517,7 +517,7 @@ function switchTab(tab) {
   document.getElementById('browseView').style.display = tab === 'browse' ? 'block' : 'none';
   document.getElementById('tabAdd').classList.toggle('active', tab === 'add');
   document.getElementById('tabBrowse').classList.toggle('active', tab === 'browse');
-  if (tab === 'browse' && cfg.apiKey && !new URLSearchParams(window.location.search).get('loc1') && !new URLSearchParams(window.location.search).get('loc2')) loadItems();
+  if (tab === 'browse' && cfg.apiKey) loadItems();
 }
 
 function showStatus(id, type, msg) {
