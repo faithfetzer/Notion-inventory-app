@@ -359,14 +359,21 @@ function checkUrlParams() {
   const loc1 = params.get('loc1');
   const loc2 = params.get('loc2');
   if (!loc1 && !loc2) return;
-    const val = loc1 || loc2;
-    const filterLoc = document.getElementById('filterLocation');
-    for (let o of filterLoc.options) {
-      if (o.value.toLowerCase() === val.toLowerCase()) { filterLoc.value = o.value; break; }
+  const val = loc1 || loc2;
+  const filterLoc = document.getElementById('filterLocation');
+  for (let o of filterLoc.options) {
+    if (o.value.toLowerCase() === val.toLowerCase()) { 
+      filterLoc.value = o.value; 
+      break; 
     }
-    switchTab('browse');
-    loadItems();
   }
+  document.getElementById('addView').style.display = 'none';
+  document.getElementById('browseView').style.display = 'block';
+  document.getElementById('tabAdd').classList.remove('active');
+  document.getElementById('tabBrowse').classList.add('active');
+  loadItems();
+}
+//Instead of calling switchTab (which triggers another loadItems), this manually does the tab switch and then calls loadItems exactly once.
 
 
 function onWorkspaceChange(selectId, displayId) {
