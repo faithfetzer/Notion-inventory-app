@@ -356,9 +356,11 @@ function getSelectedChips(containerId) {
 
 function checkUrlParams() {
   const params = new URLSearchParams(window.location.search);
-  const loc = params.get('location');
-  if (loc) {
+  const loc1 = params.get('loc1');
+  const loc2 = params.get('loc2');
+  if (loc1 || loc2) {
     const filterLoc = document.getElementById('filterLocation');
+    const val = loc1 || loc2;
     for (let o of filterLoc.options) {
       if (o.value.toLowerCase() === loc.toLowerCase()) { filterLoc.value = o.value; break; }
     }
@@ -419,7 +421,13 @@ async function loadItems() {
   const loc = document.getElementById('filterLocation').value;
   const ws = document.getElementById('filterWorkspace').value;
   const filters = [];
-  if (loc) filters.push({ property: 'Location', multi_select: { contains: loc } });
+  const loc1p = new URLSearchParams(window.location.search).get('loc1');
+  const loc2p = new URLSearchParams(window.location.search).get('loc2');
+  if (loc) filters.push({property: 'Location', multi_select: {contains: loc}});
+  if (loc1p && loc2p) {
+    filters.push({property: 'Location', multi_select: {contains: loc1p}});
+    filters.push({property: 'Location', multi_select: {contains: loc2p}});
+    }
   if (ws) filters.push({ property: 'Workspaces Database', relation: { contains: ws } });
 
   const body = { page_size: 100, sorts: [{ property: 'Name', direction: 'ascending' }] };
